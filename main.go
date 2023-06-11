@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -8,6 +9,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -17,6 +20,18 @@ func main() {
 
 	if portString == "" {
 		log.Fatal("PORT was not found in the env vars")
+	}
+
+	dbURL := os.Getenv("DB_URL")
+
+	if dbURL == "" {
+		log.Fatal("DB_URL was not found in the env vars")
+	}
+
+	conn, err := sql.Open("postgres", dbURL)
+
+	if err != nil {
+		log.Fatal("Can't connect to database", err)
 	}
 
 	router := chi.NewRouter()
