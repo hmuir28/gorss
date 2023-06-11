@@ -8,10 +8,15 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
+	"github.com/hmuir28/goRSS/internal/database"
 	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq"
 )
+
+type ApiConfig struct {
+	DB *database.Queries
+}
 
 func main() {
 	godotenv.Load(".env")
@@ -34,6 +39,12 @@ func main() {
 		log.Fatal("Can't connect to database", err)
 	}
 
+	queries := database.New(conn)
+
+	apiConfig := ApiConfig{
+		DB: queries,
+	}
+
 	router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{
@@ -48,6 +59,7 @@ func main() {
 	v1Router := chi.NewRouter()
 	v1Router.Get("/health", handleReadiness)
 	v1Router.Get("/err", handleError)
+	v1Router.Post("/user", apiConfig.handleUserCreation)
 
 	router.Mount("/v1", v1Router)
 
@@ -58,7 +70,7 @@ func main() {
 
 	log.Printf("Server starting on port %v", portString)
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 
 	if err != nil {
 		log.Fatal(err)
