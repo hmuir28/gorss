@@ -37,7 +37,7 @@ func (apiConfig ApiConfig) handleFeedCreation(w http.ResponseWriter, r *http.Req
 	})
 
 	if err != nil {
-		respondWithErr(w, 500, fmt.Sprintf("Error creating a new user: %v", err))
+		respondWithErr(w, 500, fmt.Sprintf("Error creating a new feed: %v", err))
 		return
 	}
 
